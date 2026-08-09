@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Platform-independent log processing engine for Tailord.</Description>
+  </PropertyGroup>
+</Project>
+

@@ -1,0 +1,75 @@
+<Window
+    x:Class="Tailord.Desktop.Views.MainWindow"
+    x:DataType="vm:MainWindowViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Tailord.Desktop.ViewModels"
+    Width="1100"
+    Height="700"
+    MinWidth="760"
+    MinHeight="480"
+    Title="{Binding Title}"
+    d:DesignWidth="1100"
+    d:DesignHeight="700"
+    mc:Ignorable="d">
+
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Padding="16,12" BorderBrush="{DynamicResource TextControlBorderBrush}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+        <TextBlock
+            VerticalAlignment="Center"
+            FontSize="20"
+            FontWeight="SemiBold"
+            Text="{Binding Title}" />
+        <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Foreground="{DynamicResource TextControlPlaceholderForeground}"
+            Text="{Binding Description}" />
+        <Button Grid.Column="2" Content="Open log" IsEnabled="False" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="240,*">
+      <Border Padding="16" BorderBrush="{DynamicResource TextControlBorderBrush}" BorderThickness="0,0,1,0">
+        <StackPanel Spacing="10">
+          <TextBlock FontSize="16" FontWeight="SemiBold" Text="Filters" />
+          <TextBlock
+              Foreground="{DynamicResource TextControlPlaceholderForeground}"
+              Text="Global and tab filters will live here."
+              TextWrapping="Wrap" />
+          <Button HorizontalAlignment="Stretch" Content="Add filter" IsEnabled="False" />
+        </StackPanel>
+      </Border>
+
+      <Grid Grid.Column="1" RowDefinitions="Auto,*">
+        <Border Padding="16,10" BorderBrush="{DynamicResource TextControlBorderBrush}" BorderThickness="0,0,0,1">
+          <TextBlock FontWeight="SemiBold" Text="No logs open" />
+        </Border>
+        <StackPanel
+            Grid.Row="1"
+            MaxWidth="520"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="12">
+          <TextBlock
+              HorizontalAlignment="Center"
+              FontSize="26"
+              FontWeight="SemiBold"
+              Text="Tailord is ready" />
+          <TextBlock
+              HorizontalAlignment="Center"
+              Text="The application shell is running. Incremental log reading comes next."
+              TextAlignment="Center"
+              TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+
+    <Border Grid.Row="2" Padding="12,7" BorderBrush="{DynamicResource TextControlBorderBrush}" BorderThickness="0,1,0,0">
+      <TextBlock FontSize="12" Text="{Binding Status}" />
+    </Border>
+  </Grid>
+</Window>

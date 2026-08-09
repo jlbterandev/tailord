@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Tailord: build",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/Tailord.slnx"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Tailord: test",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test", "${workspaceFolder}/Tailord.slnx", "--no-restore"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Tailord: run desktop",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run", "--project", "${workspaceFolder}/src/Tailord.Desktop/Tailord.Desktop.csproj"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Tailord: run CLI help",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run", "--project", "${workspaceFolder}/src/Tailord.Cli/Tailord.Cli.csproj", "--", "--help"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

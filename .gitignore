@@ -1,0 +1,21 @@
+## .NET build output
+bin/
+obj/
+artifacts/
+
+## IDEs
+.vs/
+.idea/
+*.user
+*.suo
+
+## macOS
+.DS_Store
+
+## Test output
+TestResults/
+coverage/
+
+## Tailord local state
+.tailord/
+

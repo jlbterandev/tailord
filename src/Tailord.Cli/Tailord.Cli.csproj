@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>tailord</AssemblyName>
+    <RootNamespace>Tailord.Cli</RootNamespace>
+    <Description>Command-line interface for Tailord.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Tailord.Core/Tailord.Core.csproj" />
+  </ItemGroup>
+</Project>
+

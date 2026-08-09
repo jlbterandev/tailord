@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Tailord.Core/Tailord.Core.csproj" />
+    <Project Path="src/Tailord.Cli/Tailord.Cli.csproj" />
+    <Project Path="src/Tailord.Desktop/Tailord.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Tailord.Core.Tests/Tailord.Core.Tests.csproj" />
+  </Folder>
+</Solution>
+
