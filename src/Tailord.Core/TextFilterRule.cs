@@ -2,19 +2,26 @@ namespace Tailord.Core;
 
 public sealed class TextFilterRule
 {
-    public TextFilterRule(string text)
+    public TextFilterRule(string text, bool caseSensitive = false)
     {
         ArgumentException.ThrowIfNullOrEmpty(text);
 
         Text = text;
+        CaseSensitive = caseSensitive;
     }
 
     public string Text { get; }
+
+    public bool CaseSensitive { get; }
 
     public bool Matches(LogEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
 
-        return entry.Message.Contains(Text, StringComparison.OrdinalIgnoreCase);
+        StringComparison comparison = CaseSensitive
+            ? StringComparison.Ordinal
+            : StringComparison.OrdinalIgnoreCase;
+
+        return entry.Message.Contains(Text, comparison);
     }
 }

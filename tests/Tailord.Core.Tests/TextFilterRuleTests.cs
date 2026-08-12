@@ -30,6 +30,20 @@ public sealed class TextFilterRuleTests
         Assert.False(matches);
     }
 
+    [Theory]
+    [InlineData("Connection TIMEOUT", "TIMEOUT", true)]
+    [InlineData("Connection TIMEOUT", "timeout", false)]
+    public void Matches_RespectsCaseWhenRequested(string message, string filterText, bool expected)
+    {
+        TextFilterRule rule = new(filterText, caseSensitive: true);
+        LogEntry entry = new(message, LogLevel.Warning);
+
+        bool matches = rule.Matches(entry);
+
+        Assert.Equal(expected, matches);
+        Assert.True(rule.CaseSensitive);
+    }
+
     [Fact]
     public void Constructor_RejectsEmptyText()
     {
