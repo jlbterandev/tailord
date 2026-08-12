@@ -131,4 +131,46 @@ public sealed class LogFilterTests
 
         Assert.False(isVisible);
     }
+
+    [Theory]
+    [InlineData(LogLevel.Warning, true)]
+    [InlineData(LogLevel.Error, true)]
+    [InlineData(LogLevel.Information, false)]
+    [InlineData(LogLevel.Unknown, false)]
+    public void IsVisible_OnlyAllowsConfiguredLevels(LogLevel level, bool expected)
+    {
+        LogLevel[] visibleLevels =
+        [
+            LogLevel.Warning,
+            LogLevel.Error,
+        ];
+        LogFilter filter = new([], visibleLevels: visibleLevels);
+        LogEntry entry = new("Log message", level);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.Equal(expected, isVisible);
+    }
+
+    [Fact]
+    public void IsVisible_AllowsUnknownWhenItIsConfigured()
+    {
+        LogFilter filter = new([], visibleLevels: [LogLevel.Unknown]);
+        LogEntry entry = new("Log message without a level", LogLevel.Unknown);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.True(isVisible);
+    }
+
+    [Fact]
+    public void IsVisible_WithAnEmptyLevelSelection_ReturnsFalse()
+    {
+        LogFilter filter = new([], visibleLevels: []);
+        LogEntry entry = new("Log message", LogLevel.Error);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.False(isVisible);
+    }
 }

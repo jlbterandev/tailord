@@ -3,10 +3,12 @@ namespace Tailord.Core;
 public sealed class LogFilter
 {
     private readonly TextFilterRule[] _rules;
+    private readonly HashSet<LogLevel>? _visibleLevels;
 
     public LogFilter(
         IEnumerable<TextFilterRule> rules,
-        InclusionMatchMode inclusionMatchMode = InclusionMatchMode.Any)
+        InclusionMatchMode inclusionMatchMode = InclusionMatchMode.Any,
+        IEnumerable<LogLevel>? visibleLevels = null)
     {
         ArgumentNullException.ThrowIfNull(rules);
 
@@ -23,6 +25,16 @@ public sealed class LogFilter
         }
 
         InclusionMode = inclusionMatchMode;
+
+        if (visibleLevels is not null)
+        {
+            _visibleLevels = visibleLevels.ToHashSet();
+
+            if (_visibleLevels.Any(level => !Enum.IsDefined(level)))
+            {
+                throw new ArgumentOutOfRangeException(nameof(visibleLevels));
+            }
+        }
     }
 
     public InclusionMatchMode InclusionMode { get; }
@@ -60,6 +72,11 @@ public sealed class LogFilter
     public bool IsVisible(LogEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
+
+        if (_visibleLevels is not null && !_visibleLevels.Contains(entry.Level))
+        {
+            return false;
+        }
 
         if (!IsIncluded(entry))
         {
