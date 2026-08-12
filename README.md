@@ -8,9 +8,10 @@ Linux.
 
 ## Status
 
-Tailord is in its first development stage. The repository currently contains
-the buildable application skeleton; log following and filtering are the next
-milestones.
+Tailord is in active development. Its core can read and follow logs while
+handling partial lines, truncation, and file rotation. The CLI can print and
+follow a single log file; CLI filtering and the live desktop viewer are the
+next milestones.
 
 ## Projects
 
@@ -33,8 +34,12 @@ dotnet restore
 dotnet build
 dotnet test
 dotnet run --project src/Tailord.Cli -- --help
+dotnet run --project src/Tailord.Cli -- sample.log
+dotnet run --project src/Tailord.Cli -- sample.log --follow
 dotnet run --project src/Tailord.Desktop
 ```
+
+Press `Ctrl+C` to stop a CLI session running with `--follow`.
 
 The repository uses `global.json` to require .NET 10 while allowing newer .NET
 10 feature bands.
@@ -50,4 +55,3 @@ The repository uses `global.json` to require .NET 10 while allowing newer .NET
 ## License
 
 [MIT](LICENSE)
-

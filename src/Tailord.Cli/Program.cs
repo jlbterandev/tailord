@@ -22,29 +22,63 @@ static async Task<int> RunAsync(string[] args)
         return 0;
     }
 
-    if (args.Length != 1 || args[0].StartsWith('-'))
+    int followOptionCount = args.Count(argument => argument == "--follow");
+    string[] paths = args.Where(argument => argument != "--follow").ToArray();
+
+    if (followOptionCount > 1 || paths.Length != 1 || paths[0].StartsWith('-'))
     {
         Console.Error.WriteLine("tailord: expected a single log file path.");
         Console.Error.WriteLine("Run 'tailord --help' for usage information.");
         return 2;
     }
 
-    string path = args[0];
+    string path = paths[0];
+    bool follow = followOptionCount == 1;
     LogFileReader reader = new();
+    using CancellationTokenSource cancellation = new();
+
+    ConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>
+    {
+        eventArgs.Cancel = true;
+        cancellation.Cancel();
+    };
 
     try
     {
-        await foreach (string line in reader.ReadExistingAsync(path))
+        IAsyncEnumerable<string> lines = follow
+            ? reader.FollowAsync(
+                path,
+                TimeSpan.FromMilliseconds(100),
+                cancellationToken: cancellation.Token)
+            : reader.ReadExistingAsync(path);
+
+        if (follow)
+        {
+            Console.CancelKeyPress += cancelHandler;
+        }
+
+        await foreach (string line in lines)
         {
             Console.WriteLine(line);
         }
 
         return 0;
     }
+    catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+    {
+        return 0;
+    }
     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
     {
         Console.Error.WriteLine($"tailord: cannot read '{path}': {exception.Message}");
         return 1;
+    }
+    finally
+    {
+        if (follow)
+        {
+            Console.CancelKeyPress -= cancelHandler;
+        }
     }
 }
 
@@ -56,10 +90,11 @@ static void PrintHelp()
 
         Usage:
           tailord <file>
+          tailord <file> --follow
           tailord --help
           tailord --version
 
-        Prints the existing lines from a log file. Following changes will be
-        introduced in a later increment.
+        Prints lines from a log file. Use --follow to wait for new lines and
+        Ctrl+C to stop.
         """);
 }
