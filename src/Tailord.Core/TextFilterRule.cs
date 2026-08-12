@@ -2,15 +2,21 @@ namespace Tailord.Core;
 
 public sealed class TextFilterRule
 {
-    public TextFilterRule(string text, bool caseSensitive = false)
+    public TextFilterRule(
+        string text,
+        FilterRuleAction action = FilterRuleAction.Include,
+        bool caseSensitive = false)
     {
         ArgumentException.ThrowIfNullOrEmpty(text);
 
         Text = text;
+        Action = action;
         CaseSensitive = caseSensitive;
     }
 
     public string Text { get; }
+
+    public FilterRuleAction Action { get; }
 
     public bool CaseSensitive { get; }
 

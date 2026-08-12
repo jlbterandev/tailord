@@ -30,6 +30,22 @@ public sealed class TextFilterRuleTests
         Assert.False(matches);
     }
 
+    [Fact]
+    public void Constructor_DefaultsToAnIncludeRule()
+    {
+        TextFilterRule rule = new("timeout");
+
+        Assert.Equal(FilterRuleAction.Include, rule.Action);
+    }
+
+    [Fact]
+    public void Constructor_PreservesExcludeAction()
+    {
+        TextFilterRule rule = new("healthcheck", FilterRuleAction.Exclude);
+
+        Assert.Equal(FilterRuleAction.Exclude, rule.Action);
+    }
+
     [Theory]
     [InlineData("Connection TIMEOUT", "TIMEOUT", true)]
     [InlineData("Connection TIMEOUT", "timeout", false)]
