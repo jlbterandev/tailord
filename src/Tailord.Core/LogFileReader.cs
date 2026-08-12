@@ -26,6 +26,7 @@ public sealed class LogFileReader
     public async IAsyncEnumerable<string> FollowAsync(
         string path,
         TimeSpan pollingInterval,
+        LogFileStartPosition startPosition = LogFileStartPosition.Beginning,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(path);
@@ -35,11 +36,24 @@ public sealed class LogFileReader
             throw new ArgumentOutOfRangeException(nameof(pollingInterval));
         }
 
+        if (!Enum.IsDefined(startPosition))
+        {
+            throw new ArgumentOutOfRangeException(nameof(startPosition));
+        }
+
         char[] characters = new char[BufferSize];
+        bool isFirstFile = true;
 
         while (true)
         {
             await using FileStream stream = OpenFile(path);
+
+            if (isFirstFile && startPosition == LogFileStartPosition.End)
+            {
+                stream.Seek(0, SeekOrigin.End);
+            }
+
+            isFirstFile = false;
             using StreamReader reader = CreateReader(stream);
             LogLineBuffer lineBuffer = new();
             bool fileWasReplaced = false;

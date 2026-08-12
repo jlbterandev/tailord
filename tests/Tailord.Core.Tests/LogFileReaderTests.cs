@@ -89,7 +89,10 @@ public sealed class LogFileReaderTests
             LogFileReader reader = new();
             using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
             await using IAsyncEnumerator<string> lines = reader
-                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    cancellationToken: cancellation.Token)
                 .GetAsyncEnumerator();
 
             Assert.True(await lines.MoveNextAsync());
@@ -118,7 +121,10 @@ public sealed class LogFileReaderTests
             LogFileReader reader = new();
             using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
             await using IAsyncEnumerator<string> lines = reader
-                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    cancellationToken: cancellation.Token)
                 .GetAsyncEnumerator();
 
             Task<bool> completedLine = lines.MoveNextAsync().AsTask();
@@ -146,7 +152,10 @@ public sealed class LogFileReaderTests
             LogFileReader reader = new();
             using CancellationTokenSource cancellation = new();
             await using IAsyncEnumerator<string> lines = reader
-                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    cancellationToken: cancellation.Token)
                 .GetAsyncEnumerator();
             Task<bool> pendingLine = lines.MoveNextAsync().AsTask();
 
@@ -173,7 +182,10 @@ public sealed class LogFileReaderTests
             LogFileReader reader = new();
             using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
             await using IAsyncEnumerator<string> lines = reader
-                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    cancellationToken: cancellation.Token)
                 .GetAsyncEnumerator();
 
             Assert.True(await lines.MoveNextAsync());
@@ -204,7 +216,10 @@ public sealed class LogFileReaderTests
             LogFileReader reader = new();
             using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
             await using IAsyncEnumerator<string> lines = reader
-                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    cancellationToken: cancellation.Token)
                 .GetAsyncEnumerator();
 
             Assert.True(await lines.MoveNextAsync());
@@ -225,6 +240,82 @@ public sealed class LogFileReaderTests
         {
             File.Delete(path);
             File.Delete(rotatedPath);
+        }
+    }
+
+    [Fact]
+    public async Task FollowAsync_FromEnd_IgnoresExistingContent()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            await File.WriteAllTextAsync(path, "Historical line\n");
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    LogFileStartPosition.End,
+                    cancellation.Token)
+                .GetAsyncEnumerator();
+
+            Task<bool> newLine = lines.MoveNextAsync().AsTask();
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            Assert.False(newLine.IsCompleted);
+
+            await File.AppendAllTextAsync(path, "Current line\n", cancellation.Token);
+
+            Assert.True(await newLine);
+            Assert.Equal("Current line", lines.Current);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task FollowAsync_ReadsBurstOfAppendedLinesInOrder()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            const int lineCount = 100;
+            string[] expectedLines = Enumerable.Range(1, lineCount)
+                .Select(number => $"Line {number}")
+                .ToArray();
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(
+                    path,
+                    TimeSpan.FromMilliseconds(10),
+                    LogFileStartPosition.End,
+                    cancellation.Token)
+                .GetAsyncEnumerator();
+            Task<bool> firstLine = lines.MoveNextAsync().AsTask();
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            Assert.False(firstLine.IsCompleted);
+            await File.AppendAllLinesAsync(path, expectedLines, cancellation.Token);
+
+            List<string> actualLines = [];
+            Assert.True(await firstLine);
+            actualLines.Add(lines.Current);
+
+            while (actualLines.Count < lineCount && await lines.MoveNextAsync())
+            {
+                actualLines.Add(lines.Current);
+            }
+
+            Assert.Equal(expectedLines, actualLines);
+        }
+        finally
+        {
+            File.Delete(path);
         }
     }
 }
