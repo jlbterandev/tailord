@@ -159,4 +159,36 @@ public sealed class LogFileReaderTests
             File.Delete(path);
         }
     }
+
+    [Fact]
+    public async Task FollowAsync_RestartsAndDiscardsPartialLineAfterTruncation()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            await File.WriteAllTextAsync(
+                path,
+                "Original completed line with enough text\nOld partial line with enough text");
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .GetAsyncEnumerator();
+
+            Assert.True(await lines.MoveNextAsync());
+            Assert.Equal("Original completed line with enough text", lines.Current);
+
+            Task<bool> lineAfterTruncation = lines.MoveNextAsync().AsTask();
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            await File.WriteAllTextAsync(path, "New line\n", cancellation.Token);
+
+            Assert.True(await lineAfterTruncation);
+            Assert.Equal("New line", lines.Current);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

@@ -45,6 +45,14 @@ public sealed class LogFileReader
 
             if (charactersRead == 0)
             {
+                if (stream.Length < stream.Position)
+                {
+                    reader.DiscardBufferedData();
+                    stream.Seek(0, SeekOrigin.Begin);
+                    lineBuffer = new LogLineBuffer();
+                    continue;
+                }
+
                 await Task.Delay(pollingInterval, cancellationToken);
                 continue;
             }
