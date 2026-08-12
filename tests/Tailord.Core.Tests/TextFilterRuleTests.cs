@@ -65,4 +65,40 @@ public sealed class TextFilterRuleTests
     {
         Assert.Throws<ArgumentException>(() => new TextFilterRule(string.Empty));
     }
+
+    [Theory]
+    [InlineData("Request from 10.20.30.40", @"10\.20\.\d+\.\d+", true)]
+    [InlineData("Connection TIMEOUT", "timeout|unavailable", true)]
+    [InlineData("Request completed", "timeout|unavailable", false)]
+    public void Matches_WithRegularExpression_EvaluatesPattern(string message, string pattern, bool expected)
+    {
+        TextFilterRule rule = new(pattern, matchMode: TextFilterMatchMode.RegularExpression);
+        LogEntry entry = new(message, LogLevel.Information);
+
+        bool matches = rule.Matches(entry);
+
+        Assert.Equal(expected, matches);
+        Assert.Equal(TextFilterMatchMode.RegularExpression, rule.MatchMode);
+    }
+
+    [Fact]
+    public void Matches_WithCaseSensitiveRegularExpression_RespectsCase()
+    {
+        TextFilterRule rule = new(
+            "TIMEOUT|unavailable",
+            caseSensitive: true,
+            matchMode: TextFilterMatchMode.RegularExpression);
+        LogEntry entry = new("Connection timeout", LogLevel.Warning);
+
+        bool matches = rule.Matches(entry);
+
+        Assert.False(matches);
+    }
+
+    [Fact]
+    public void Constructor_RejectsInvalidRegularExpression()
+    {
+        Assert.Throws<ArgumentException>(
+            () => new TextFilterRule("[", matchMode: TextFilterMatchMode.RegularExpression));
+    }
 }
