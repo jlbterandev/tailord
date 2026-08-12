@@ -84,4 +84,51 @@ public sealed class LogFilterTests
 
         Assert.False(isIncluded);
     }
+
+    [Fact]
+    public void IsVisible_ReturnsFalseWhenAnExcludeRuleMatchesAfterAnInclusion()
+    {
+        TextFilterRule[] rules =
+        [
+            new("timeout"),
+            new("healthcheck", FilterRuleAction.Exclude),
+        ];
+        LogFilter filter = new(rules);
+        LogEntry entry = new("Healthcheck timeout after 30 seconds", LogLevel.Warning);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.False(isVisible);
+    }
+
+    [Fact]
+    public void IsVisible_ReturnsTrueWhenInclusionMatchesAndExclusionsDoNot()
+    {
+        TextFilterRule[] rules =
+        [
+            new("timeout"),
+            new("healthcheck", FilterRuleAction.Exclude),
+        ];
+        LogFilter filter = new(rules);
+        LogEntry entry = new("Database timeout after 30 seconds", LogLevel.Error);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.True(isVisible);
+    }
+
+    [Fact]
+    public void IsVisible_AppliesExclusionsWhenThereAreNoIncludeRules()
+    {
+        TextFilterRule[] rules =
+        [
+            new("healthcheck", FilterRuleAction.Exclude),
+        ];
+        LogFilter filter = new(rules);
+        LogEntry entry = new("Healthcheck completed", LogLevel.Information);
+
+        bool isVisible = filter.IsVisible(entry);
+
+        Assert.False(isVisible);
+    }
 }

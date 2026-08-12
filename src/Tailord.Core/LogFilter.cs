@@ -56,4 +56,24 @@ public sealed class LogFilter
 
         return InclusionMode == InclusionMatchMode.All || !hasInclusionRules;
     }
+
+    public bool IsVisible(LogEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        if (!IsIncluded(entry))
+        {
+            return false;
+        }
+
+        foreach (TextFilterRule rule in _rules)
+        {
+            if (rule.Action == FilterRuleAction.Exclude && rule.Matches(entry))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
