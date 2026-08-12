@@ -77,4 +77,86 @@ public sealed class LogFileReaderTests
             File.Delete(path);
         }
     }
+
+    [Fact]
+    public async Task FollowAsync_ReadsExistingAndAppendedCompleteLines()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            await File.WriteAllTextAsync(path, "Existing line\n");
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .GetAsyncEnumerator();
+
+            Assert.True(await lines.MoveNextAsync());
+            Assert.Equal("Existing line", lines.Current);
+
+            Task<bool> appendedLine = lines.MoveNextAsync().AsTask();
+            await File.AppendAllTextAsync(path, "Appended line\n", cancellation.Token);
+
+            Assert.True(await appendedLine);
+            Assert.Equal("Appended line", lines.Current);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task FollowAsync_WaitsForAPartialLineToBeCompleted()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            await File.WriteAllTextAsync(path, "Partial");
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .GetAsyncEnumerator();
+
+            Task<bool> completedLine = lines.MoveNextAsync().AsTask();
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            Assert.False(completedLine.IsCompleted);
+
+            await File.AppendAllTextAsync(path, " line\n", cancellation.Token);
+
+            Assert.True(await completedLine);
+            Assert.Equal("Partial line", lines.Current);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task FollowAsync_CanBeCancelledWhileWaitingForContent()
+    {
+        string path = Path.GetTempFileName();
+
+        try
+        {
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new();
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .GetAsyncEnumerator();
+            Task<bool> pendingLine = lines.MoveNextAsync().AsTask();
+
+            cancellation.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await pendingLine);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }
