@@ -191,4 +191,40 @@ public sealed class LogFileReaderTests
             File.Delete(path);
         }
     }
+
+    [Fact]
+    public async Task FollowAsync_ReopensFileAfterRotation()
+    {
+        string path = Path.GetTempFileName();
+        string rotatedPath = $"{path}.rotated";
+
+        try
+        {
+            await File.WriteAllTextAsync(path, "Original line\nOld partial line");
+            LogFileReader reader = new();
+            using CancellationTokenSource cancellation = new(TimeSpan.FromSeconds(5));
+            await using IAsyncEnumerator<string> lines = reader
+                .FollowAsync(path, TimeSpan.FromMilliseconds(10), cancellation.Token)
+                .GetAsyncEnumerator();
+
+            Assert.True(await lines.MoveNextAsync());
+            Assert.Equal("Original line", lines.Current);
+
+            Task<bool> lineAfterRotation = lines.MoveNextAsync().AsTask();
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            File.Move(path, rotatedPath);
+            await Task.Delay(TimeSpan.FromMilliseconds(100), cancellation.Token);
+            Assert.False(lineAfterRotation.IsCompleted);
+
+            await File.WriteAllTextAsync(path, "New file line\n", cancellation.Token);
+
+            Assert.True(await lineAfterRotation);
+            Assert.Equal("New file line", lines.Current);
+        }
+        finally
+        {
+            File.Delete(path);
+            File.Delete(rotatedPath);
+        }
+    }
 }
