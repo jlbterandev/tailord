@@ -9,7 +9,8 @@ Linux.
 ## Status
 
 Tailord is in active development. Its core can read and follow logs while
-handling partial lines, truncation, and file rotation. The CLI can print and
+handling partial lines, truncation, file rotation, visual alerts, email alerts with cron
+and run as service(background monitor) . The CLI can print and
 follow a single log file; CLI filtering and the live desktop viewer are the
 next milestones.
 
