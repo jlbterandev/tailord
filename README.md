@@ -9,10 +9,22 @@ Linux.
 ## Status
 
 Tailord is in active development. Its core can read and follow logs while
-handling partial lines, truncation, file rotation, visual alerts, email alerts with cron
-and run as service(background monitor) . The CLI can print and
-follow a single log file; CLI filtering and the live desktop viewer are the
+handling partial lines, truncation, and file rotation. The CLI can print and
+follow a single log file. CLI filtering and the live desktop viewer are the
 next milestones.
+
+Future releases are intended to add rule-based visual alerts, unattended
+background monitoring, and notification channels such as email. Operating
+system integration may include cron or systemd on Linux, launchd on macOS, and
+Task Scheduler or a Windows Service on Windows. These capabilities are planned,
+not implemented yet.
+
+## Documentation
+
+- [Product vision and requirements](docs/PRODUCT.md)
+- [Development roadmap and current progress](docs/ROADMAP.md)
+- [Architecture and dependency rules](docs/architecture.md)
+- [Collaboration guidelines](AGENTS.md)
 
 ## Projects
 
@@ -45,13 +57,11 @@ Press `Ctrl+C` to stop a CLI session running with `--follow`.
 The repository uses `global.json` to require .NET 10 while allowing newer .NET
 10 feature bands.
 
-## Roadmap
+## Development direction
 
-1. Define log entries, levels, and filter rules in `Tailord.Core`.
-2. Follow large files incrementally, including truncation and rotation.
-3. Expose the engine through the CLI.
-4. Display a live, virtualized log in the desktop application.
-5. Add tabs, global and local filters, token highlighting, and workspaces.
+Development proceeds through small, tested increments. See the
+[roadmap](docs/ROADMAP.md) for completed work, the current milestone, and
+planned capabilities.
 
 ## License
 

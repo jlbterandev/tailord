@@ -18,7 +18,7 @@ Status: complete.
 - Document the product, architecture, roadmap, and collaboration rules.
 - Initialize Git and establish a clean published baseline.
 
-Status: in progress.
+Status: complete.
 
 ## 2. Minimal domain model
 
@@ -30,6 +30,8 @@ Implement and test these as separate increments:
 
 Exit criterion: log text can become classified entries without UI dependencies.
 
+Status: complete.
+
 ## 3. Filtering engine
 
 Add simple text rules, case sensitivity, inclusion and exclusion, `ANY` and
@@ -38,6 +40,8 @@ highlighting rules independent from visibility filters.
 
 Exit criterion: collections of log entries can be evaluated predictably by
 reusable rules.
+
+Status: complete.
 
 ## 4. Incremental file reader
 
@@ -48,6 +52,8 @@ only after tests establish the required reliability.
 
 Exit criterion: the core can follow a real log continuously with bounded memory.
 
+Status: in progress.
+
 ## 5. Functional CLI
 
 Open and print a file, follow changes, filter by level, include or exclude text,
@@ -56,6 +62,8 @@ small increments.
 
 Exit criterion: a command such as
 `tailord app.log --follow --level warning,error` uses only `Tailord.Core`.
+
+Status: in progress.
 
 ## 6. Functional desktop viewer
 
@@ -80,7 +88,23 @@ regular expressions, color rules, and visible counters.
 Add platform-correct paths, schema-versioned JSON, atomic writes, workspaces,
 session restoration, missing-file behavior, and recovery from invalid data.
 
-## 10. Hardening and release
+## 10. Monitoring and alerts
+
+- Define alert rules separately from visibility filters and highlighting.
+- Add visual alerts to the desktop application.
+- Monitor one or more logs without an interactive desktop session.
+- Add notification channels such as email without storing credentials in logs
+  or workspace files.
+- Handle repeated alerts, delivery failures, missing files, and clean shutdown.
+- Evaluate platform hosts such as cron or systemd on Linux, launchd on macOS,
+  and Task Scheduler or a Windows Service on Windows.
+- Verify bounded resource use when several high-volume logs are monitored.
+
+Exit criterion: Tailord can run unattended on supported platforms and issue a
+configured alert reliably without coupling notification delivery to the core
+file reader.
+
+## 11. Hardening and release
 
 Test large files, long sessions, bounded memory, filter performance, application
 errors, accessibility, and packaging. Prepare installation and usage docs before

@@ -43,6 +43,27 @@ The CLI is a real product interface and an early integration point for the core
 engine. Its intended usage includes opening or following a file, reading stdin,
 and applying level, inclusion, exclusion, and regular-expression filters.
 
+## Monitoring and alerts
+
+Tailord is also intended to support unattended monitoring when continuously
+watching logs is more useful than keeping the desktop application visible.
+Planned capabilities include:
+
+- Visual alerts in the desktop application when a configured rule matches.
+- Headless background monitoring of one or more log files.
+- Alert rules that can reuse classification and pattern matching without being
+  coupled to visibility filters or highlighting rules.
+- Notification channels such as email, with explicit handling for repeated
+  events, delivery failures, and sensitive configuration.
+- Clear operational status when a monitored file disappears, rotates, or
+  cannot be read.
+
+Running unattended must remain cross-platform. Cron or systemd may be suitable
+integration points on Linux, while launchd on macOS and Task Scheduler or a
+Windows Service may serve the same purpose on their platforms. The exact host
+and notification design will be selected and tested in a later stage; it is not
+part of the core reader or the current CLI behavior.
+
 ## Persistence
 
 Future per-user configuration will use the standard application-data location
