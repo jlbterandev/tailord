@@ -26,6 +26,7 @@ static async Task<int> RunAsync(string[] args)
     bool follow = false;
     bool fromEnd = false;
     HashSet<LogLevel>? visibleLevels = null;
+    string? includeText = null;
 
     for (int index = 0; index < args.Length; index++)
     {
@@ -69,6 +70,20 @@ static async Task<int> RunAsync(string[] args)
 
                 break;
 
+            case "--include":
+                if (includeText is not null)
+                {
+                    return PrintUsageError("--include can only be specified once.");
+                }
+
+                if (++index >= args.Length || args[index].Length == 0)
+                {
+                    return PrintUsageError("--include requires text to match.");
+                }
+
+                includeText = args[index];
+                break;
+
             default:
                 if (argument.StartsWith('-') || path is not null)
                 {
@@ -91,9 +106,12 @@ static async Task<int> RunAsync(string[] args)
     }
 
     LogFileReader reader = new();
-    LogFilter? filter = visibleLevels is null
+    TextFilterRule[] rules = includeText is null
+        ? []
+        : [new TextFilterRule(includeText)];
+    LogFilter? filter = visibleLevels is null && rules.Length == 0
         ? null
-        : new LogFilter([], visibleLevels: visibleLevels);
+        : new LogFilter(rules, visibleLevels: visibleLevels);
     using CancellationTokenSource cancellation = new();
 
     ConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>
@@ -191,12 +209,14 @@ static void PrintHelp()
           tailord <file> --follow
           tailord <file> --follow --from-end
           tailord <file> --level <level[,level...]>
+          tailord <file> --include <text>
           tailord --help
           tailord --version
 
         Prints lines from a log file. Use --follow to wait for new lines and
         Ctrl+C to stop. Add --from-end to ignore lines that already exist when
         following starts. Available levels: unknown, debug, information,
-        warning, error, critical.
+        warning, error, critical. --include performs a case-insensitive text
+        match.
         """);
 }

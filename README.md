@@ -70,6 +70,7 @@ dotnet run --project src/Tailord.Cli -- sample.log
 dotnet run --project src/Tailord.Cli -- sample.log --follow
 dotnet run --project src/Tailord.Cli -- sample.log --follow --from-end
 dotnet run --project src/Tailord.Cli -- sample.log --level warning,error
+dotnet run --project src/Tailord.Cli -- sample.log --include "timeout"
 dotnet run --project src/Tailord.Desktop
 ```
 
@@ -79,6 +80,8 @@ after monitoring starts.
 Use `--level` with one or more comma-separated values: `unknown`, `debug`,
 `information`, `warning`, `error`, or `critical`. Level names are
 case-insensitive.
+Use `--include` to show only lines containing the supplied text. Matching is
+case-insensitive and can be combined with `--level` and `--follow`.
 
 The repository uses `global.json` to require .NET 10 while allowing newer .NET
 10 feature bands.
