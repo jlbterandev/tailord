@@ -22,34 +22,78 @@ static async Task<int> RunAsync(string[] args)
         return 0;
     }
 
-    int followOptionCount = args.Count(argument => argument == "--follow");
-    int fromEndOptionCount = args.Count(argument => argument == "--from-end");
-    string[] paths = args
-        .Where(argument => argument is not "--follow" and not "--from-end")
-        .ToArray();
+    string? path = null;
+    bool follow = false;
+    bool fromEnd = false;
+    HashSet<LogLevel>? visibleLevels = null;
 
-    if (followOptionCount > 1
-        || fromEndOptionCount > 1
-        || paths.Length != 1
-        || paths[0].StartsWith('-'))
+    for (int index = 0; index < args.Length; index++)
     {
-        Console.Error.WriteLine("tailord: expected a single log file path.");
-        Console.Error.WriteLine("Run 'tailord --help' for usage information.");
-        return 2;
+        string argument = args[index];
+
+        switch (argument)
+        {
+            case "--follow":
+                if (follow)
+                {
+                    return PrintUsageError("--follow can only be specified once.");
+                }
+
+                follow = true;
+                break;
+
+            case "--from-end":
+                if (fromEnd)
+                {
+                    return PrintUsageError("--from-end can only be specified once.");
+                }
+
+                fromEnd = true;
+                break;
+
+            case "--level":
+                if (visibleLevels is not null)
+                {
+                    return PrintUsageError("--level can only be specified once.");
+                }
+
+                if (++index >= args.Length)
+                {
+                    return PrintUsageError("--level requires a comma-separated list.");
+                }
+
+                if (!TryParseLevels(args[index], out visibleLevels, out string? invalidLevel))
+                {
+                    return PrintUsageError($"unknown log level '{invalidLevel}'.");
+                }
+
+                break;
+
+            default:
+                if (argument.StartsWith('-') || path is not null)
+                {
+                    return PrintUsageError("expected a single log file path.");
+                }
+
+                path = argument;
+                break;
+        }
     }
 
-    string path = paths[0];
-    bool follow = followOptionCount == 1;
-    bool fromEnd = fromEndOptionCount == 1;
+    if (path is null)
+    {
+        return PrintUsageError("expected a single log file path.");
+    }
 
     if (fromEnd && !follow)
     {
-        Console.Error.WriteLine("tailord: --from-end requires --follow.");
-        Console.Error.WriteLine("Run 'tailord --help' for usage information.");
-        return 2;
+        return PrintUsageError("--from-end requires --follow.");
     }
 
     LogFileReader reader = new();
+    LogFilter? filter = visibleLevels is null
+        ? null
+        : new LogFilter([], visibleLevels: visibleLevels);
     using CancellationTokenSource cancellation = new();
 
     ConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>
@@ -75,7 +119,12 @@ static async Task<int> RunAsync(string[] args)
 
         await foreach (string line in lines)
         {
-            Console.WriteLine(line);
+            LogEntry entry = new(line, LogTextClassifier.DetectLevel(line));
+
+            if (filter is null || filter.IsVisible(entry))
+            {
+                Console.WriteLine(line);
+            }
         }
 
         return 0;
@@ -98,6 +147,39 @@ static async Task<int> RunAsync(string[] args)
     }
 }
 
+static bool TryParseLevels(
+    string value,
+    out HashSet<LogLevel> levels,
+    out string? invalidLevel)
+{
+    levels = [];
+    invalidLevel = null;
+
+    foreach (string name in value.Split(',', StringSplitOptions.TrimEntries))
+    {
+        bool isKnownLevel = name.Length > 0
+            && Enum.GetNames<LogLevel>()
+                .Any(knownName => string.Equals(knownName, name, StringComparison.OrdinalIgnoreCase));
+
+        if (!isKnownLevel)
+        {
+            invalidLevel = name;
+            return false;
+        }
+
+        levels.Add(Enum.Parse<LogLevel>(name, ignoreCase: true));
+    }
+
+    return true;
+}
+
+static int PrintUsageError(string message)
+{
+    Console.Error.WriteLine($"tailord: {message}");
+    Console.Error.WriteLine("Run 'tailord --help' for usage information.");
+    return 2;
+}
+
 static void PrintHelp()
 {
     Console.WriteLine($$"""
@@ -108,11 +190,13 @@ static void PrintHelp()
           tailord <file>
           tailord <file> --follow
           tailord <file> --follow --from-end
+          tailord <file> --level <level[,level...]>
           tailord --help
           tailord --version
 
         Prints lines from a log file. Use --follow to wait for new lines and
         Ctrl+C to stop. Add --from-end to ignore lines that already exist when
-        following starts.
+        following starts. Available levels: unknown, debug, information,
+        warning, error, critical.
         """);
 }
