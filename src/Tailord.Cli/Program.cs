@@ -27,6 +27,7 @@ static async Task<int> RunAsync(string[] args)
     bool fromEnd = false;
     HashSet<LogLevel>? visibleLevels = null;
     string? includeText = null;
+    string? excludeText = null;
 
     for (int index = 0; index < args.Length; index++)
     {
@@ -84,6 +85,20 @@ static async Task<int> RunAsync(string[] args)
                 includeText = args[index];
                 break;
 
+            case "--exclude":
+                if (excludeText is not null)
+                {
+                    return PrintUsageError("--exclude can only be specified once.");
+                }
+
+                if (++index >= args.Length || args[index].Length == 0)
+                {
+                    return PrintUsageError("--exclude requires text to match.");
+                }
+
+                excludeText = args[index];
+                break;
+
             default:
                 if (argument.StartsWith('-') || path is not null)
                 {
@@ -106,10 +121,19 @@ static async Task<int> RunAsync(string[] args)
     }
 
     LogFileReader reader = new();
-    TextFilterRule[] rules = includeText is null
-        ? []
-        : [new TextFilterRule(includeText)];
-    LogFilter? filter = visibleLevels is null && rules.Length == 0
+    List<TextFilterRule> rules = [];
+
+    if (includeText is not null)
+    {
+        rules.Add(new TextFilterRule(includeText));
+    }
+
+    if (excludeText is not null)
+    {
+        rules.Add(new TextFilterRule(excludeText, FilterRuleAction.Exclude));
+    }
+
+    LogFilter? filter = visibleLevels is null && rules.Count == 0
         ? null
         : new LogFilter(rules, visibleLevels: visibleLevels);
     using CancellationTokenSource cancellation = new();
@@ -210,6 +234,7 @@ static void PrintHelp()
           tailord <file> --follow --from-end
           tailord <file> --level <level[,level...]>
           tailord <file> --include <text>
+          tailord <file> --exclude <text>
           tailord --help
           tailord --version
 
@@ -217,6 +242,6 @@ static void PrintHelp()
         Ctrl+C to stop. Add --from-end to ignore lines that already exist when
         following starts. Available levels: unknown, debug, information,
         warning, error, critical. --include performs a case-insensitive text
-        match.
+        match; --exclude hides matching lines after other filters are applied.
         """);
 }

@@ -71,6 +71,7 @@ dotnet run --project src/Tailord.Cli -- sample.log --follow
 dotnet run --project src/Tailord.Cli -- sample.log --follow --from-end
 dotnet run --project src/Tailord.Cli -- sample.log --level warning,error
 dotnet run --project src/Tailord.Cli -- sample.log --include "timeout"
+dotnet run --project src/Tailord.Cli -- sample.log --exclude "healthcheck"
 dotnet run --project src/Tailord.Desktop
 ```
 
@@ -82,6 +83,8 @@ Use `--level` with one or more comma-separated values: `unknown`, `debug`,
 case-insensitive.
 Use `--include` to show only lines containing the supplied text. Matching is
 case-insensitive and can be combined with `--level` and `--follow`.
+Use `--exclude` to hide matching lines. Exclusions are evaluated after level
+and inclusion filters, so an excluded line always remains hidden.
 
 The repository uses `global.json` to require .NET 10 while allowing newer .NET
 10 feature bands.
