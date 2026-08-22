@@ -23,9 +23,15 @@ static async Task<int> RunAsync(string[] args)
     }
 
     int followOptionCount = args.Count(argument => argument == "--follow");
-    string[] paths = args.Where(argument => argument != "--follow").ToArray();
+    int fromEndOptionCount = args.Count(argument => argument == "--from-end");
+    string[] paths = args
+        .Where(argument => argument is not "--follow" and not "--from-end")
+        .ToArray();
 
-    if (followOptionCount > 1 || paths.Length != 1 || paths[0].StartsWith('-'))
+    if (followOptionCount > 1
+        || fromEndOptionCount > 1
+        || paths.Length != 1
+        || paths[0].StartsWith('-'))
     {
         Console.Error.WriteLine("tailord: expected a single log file path.");
         Console.Error.WriteLine("Run 'tailord --help' for usage information.");
@@ -34,6 +40,15 @@ static async Task<int> RunAsync(string[] args)
 
     string path = paths[0];
     bool follow = followOptionCount == 1;
+    bool fromEnd = fromEndOptionCount == 1;
+
+    if (fromEnd && !follow)
+    {
+        Console.Error.WriteLine("tailord: --from-end requires --follow.");
+        Console.Error.WriteLine("Run 'tailord --help' for usage information.");
+        return 2;
+    }
+
     LogFileReader reader = new();
     using CancellationTokenSource cancellation = new();
 
@@ -49,6 +64,7 @@ static async Task<int> RunAsync(string[] args)
             ? reader.FollowAsync(
                 path,
                 TimeSpan.FromMilliseconds(100),
+                fromEnd ? LogFileStartPosition.End : LogFileStartPosition.Beginning,
                 cancellationToken: cancellation.Token)
             : reader.ReadExistingAsync(path);
 
@@ -91,10 +107,12 @@ static void PrintHelp()
         Usage:
           tailord <file>
           tailord <file> --follow
+          tailord <file> --follow --from-end
           tailord --help
           tailord --version
 
         Prints lines from a log file. Use --follow to wait for new lines and
-        Ctrl+C to stop.
+        Ctrl+C to stop. Add --from-end to ignore lines that already exist when
+        following starts.
         """);
 }

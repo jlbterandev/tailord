@@ -68,10 +68,13 @@ dotnet test
 dotnet run --project src/Tailord.Cli -- --help
 dotnet run --project src/Tailord.Cli -- sample.log
 dotnet run --project src/Tailord.Cli -- sample.log --follow
+dotnet run --project src/Tailord.Cli -- sample.log --follow --from-end
 dotnet run --project src/Tailord.Desktop
 ```
 
 Press `Ctrl+C` to stop a CLI session running with `--follow`.
+Add `--from-end` to ignore existing content and display only lines appended
+after monitoring starts.
 
 The repository uses `global.json` to require .NET 10 while allowing newer .NET
 10 feature bands.
