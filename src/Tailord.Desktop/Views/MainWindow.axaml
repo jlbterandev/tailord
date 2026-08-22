@@ -28,7 +28,7 @@
             VerticalAlignment="Center"
             Foreground="{DynamicResource TextControlPlaceholderForeground}"
             Text="{Binding Description}" />
-        <Button Grid.Column="2" Content="Open log" IsEnabled="False" />
+        <Button Grid.Column="2" Click="OpenLog_Click" Content="Open log" />
       </Grid>
     </Border>
 
@@ -46,7 +46,7 @@
 
       <Grid Grid.Column="1" RowDefinitions="Auto,*">
         <Border Padding="16,10" BorderBrush="{DynamicResource TextControlBorderBrush}" BorderThickness="0,0,0,1">
-          <TextBlock FontWeight="SemiBold" Text="No logs open" />
+          <TextBlock FontWeight="SemiBold" Text="{Binding SelectedFileName}" />
         </Border>
         <StackPanel
             Grid.Row="1"
@@ -58,10 +58,10 @@
               HorizontalAlignment="Center"
               FontSize="26"
               FontWeight="SemiBold"
-              Text="Tailord is ready" />
+              Text="{Binding SelectedFileName}" />
           <TextBlock
               HorizontalAlignment="Center"
-              Text="The application shell is running. Incremental log reading comes next."
+              Text="{Binding SelectedFilePath}"
               TextAlignment="Center"
               TextWrapping="Wrap" />
         </StackPanel>
