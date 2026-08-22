@@ -1,0 +1,119 @@
+2026-08-22T06:00:00.012Z INFO  [bootstrap] Demo service starting version=1.4.0 environment=demo
+2026-08-22T06:00:00.028Z DEBUG [bootstrap] Runtime=.NET 10.0 OS=CrossPlatform Architecture=arm64
+2026-08-22T06:00:00.041Z DEBUG [config] Loading configuration from /opt/tailord-demo/config/appsettings.json
+2026-08-22T06:00:00.055Z INFO  [config] Configuration loaded profiles=3 refreshInterval=30s
+2026-08-22T06:00:00.071Z INFO  [storage] Opening local database path=/var/lib/tailord-demo/state.db
+2026-08-22T06:00:00.096Z INFO  [storage] Database ready schemaVersion=7
+2026-08-22T06:00:00.104Z DEBUG [network] Resolving host api.demo.invalid
+2026-08-22T06:00:00.125Z INFO  [network] Endpoint resolved host=api.demo.invalid address=192.0.2.10
+2026-08-22T06:00:00.148Z INFO  [listener] Listening on http://127.0.0.1:5080
+2026-08-22T06:00:00.163Z INFO  [bootstrap] Demo service started elapsedMs=151
+2026-08-22T06:00:10.002Z DEBUG [scheduler] Starting cycle cycleId=cycle-0001
+2026-08-22T06:00:10.016Z INFO  [collector-a] Poll started sourceId=source-a endpoint=192.0.2.21
+2026-08-22T06:00:10.019Z INFO  [collector-b] Poll started sourceId=source-b endpoint=192.0.2.22
+2026-08-22T06:00:10.024Z INFO  [collector-c] Poll started sourceId=source-c endpoint=192.0.2.23
+2026-08-22T06:00:10.051Z DEBUG [collector-a] Received payload bytes=1842 requestId=req-10001
+2026-08-22T06:00:10.064Z DEBUG [collector-b] Received payload bytes=956 requestId=req-10002
+2026-08-22T06:00:10.079Z INFO  [collector-a] Poll completed records=24 elapsedMs=62
+2026-08-22T06:00:10.088Z INFO  [collector-b] Poll completed records=12 elapsedMs=68
+2026-08-22T06:00:10.271Z WARN  [collector-c] Response delayed elapsedMs=247 thresholdMs=200 requestId=req-10003
+2026-08-22T06:00:10.332Z INFO  [collector-c] Poll completed records=8 elapsedMs=307
+2026-08-22T06:00:10.350Z INFO  [scheduler] Cycle completed cycleId=cycle-0001 records=44 elapsedMs=348
+2026-08-22T06:00:15.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=3
+2026-08-22T06:00:20.001Z DEBUG [scheduler] Starting cycle cycleId=cycle-0002
+2026-08-22T06:00:20.018Z INFO  [collector-a] Poll started sourceId=source-a endpoint=192.0.2.21
+2026-08-22T06:00:20.022Z INFO  [collector-b] Poll started sourceId=source-b endpoint=192.0.2.22
+2026-08-22T06:00:20.027Z INFO  [collector-c] Poll started sourceId=source-c endpoint=192.0.2.23
+2026-08-22T06:00:20.061Z DEBUG [collector-a] Received payload bytes=1764 requestId=req-10004
+2026-08-22T06:00:20.076Z INFO  [collector-a] Poll completed records=23 elapsedMs=57
+2026-08-22T06:00:20.114Z WARN  [collector-b] Retrying request attempt=1 reason="Connection reset" requestId=req-10005
+2026-08-22T06:00:20.198Z INFO  [collector-c] Poll completed records=10 elapsedMs=170
+2026-08-22T06:00:20.245Z INFO  [collector-b] Retry succeeded attempt=1 records=11 elapsedMs=222
+2026-08-22T06:00:20.261Z INFO  [scheduler] Cycle completed cycleId=cycle-0002 records=44 elapsedMs=260
+2026-08-22T06:00:25.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=2
+2026-08-22T06:00:30.003Z DEBUG [scheduler] Starting cycle cycleId=cycle-0003
+2026-08-22T06:00:30.021Z INFO  [collector-a] Poll started sourceId=source-a endpoint=192.0.2.21
+2026-08-22T06:00:30.025Z INFO  [collector-b] Poll started sourceId=source-b endpoint=192.0.2.22
+2026-08-22T06:00:30.029Z INFO  [collector-c] Poll started sourceId=source-c endpoint=192.0.2.23
+2026-08-22T06:00:30.080Z INFO  [collector-a] Poll completed records=22 elapsedMs=58
+2026-08-22T06:00:30.224Z WARN  [collector-b] Request timeout attempt=1 timeoutMs=200 requestId=req-10008
+2026-08-22T06:00:30.231Z WARN  [collector-c] Request timeout attempt=1 timeoutMs=200 requestId=req-10009
+2026-08-22T06:00:30.451Z WARN  [collector-b] Request timeout attempt=2 timeoutMs=200 requestId=req-10008
+2026-08-22T06:00:30.462Z INFO  [collector-c] Retry succeeded attempt=2 records=9 elapsedMs=432
+2026-08-22T06:00:30.677Z ERROR [collector-b] Poll failed after retries endpoint=192.0.2.22 requestId=req-10008
+2026-08-22T06:00:30.678Z ERROR [collector-b] System.TimeoutException: No response within 200 milliseconds.
+   at Demo.Transport.Client.SendAsync(String requestId, CancellationToken cancellationToken)
+   at Demo.Collectors.SourceCollector.PollAsync(CancellationToken cancellationToken)
+2026-08-22T06:00:30.691Z WARN  [scheduler] Cycle completed with failures cycleId=cycle-0003 succeeded=2 failed=1
+2026-08-22T06:00:35.001Z WARN  [health] Healthcheck completed status=Degraded dependency=source-b
+2026-08-22T06:00:40.005Z DEBUG [scheduler] Starting cycle cycleId=cycle-0004
+2026-08-22T06:00:40.026Z INFO  [collector-a] Poll started sourceId=source-a endpoint=192.0.2.21
+2026-08-22T06:00:40.030Z INFO  [collector-b] Poll started sourceId=source-b endpoint=192.0.2.22
+2026-08-22T06:00:40.034Z INFO  [collector-c] Poll started sourceId=source-c endpoint=192.0.2.23
+2026-08-22T06:00:40.092Z INFO  [collector-a] Poll completed records=25 elapsedMs=65
+2026-08-22T06:00:40.105Z INFO  [collector-c] Poll completed records=12 elapsedMs=70
+2026-08-22T06:00:40.255Z WARN  [collector-b] Request timeout attempt=1 timeoutMs=200 requestId=req-10011
+2026-08-22T06:00:40.481Z ERROR [collector-b] AuthenticationException: Remote certificate validation failed.
+   at Demo.Transport.TlsChannel.AuthenticateAsync(String host)
+   at Demo.Transport.Client.ConnectAsync(Uri endpoint, CancellationToken cancellationToken)
+2026-08-22T06:00:40.489Z INFO  [diagnostics] Certificate subject=CN=api.demo.invalid expires=2026-08-23T00:00:00Z
+2026-08-22T06:00:40.501Z WARN  [scheduler] Cycle completed with failures cycleId=cycle-0004 succeeded=2 failed=1
+2026-08-22T06:00:45.000Z WARN  [health] Healthcheck completed status=Degraded dependency=source-b
+2026-08-22T06:00:50.002Z INFO  [config] Configuration file changed path=C:\TailordDemo\config\appsettings.json
+2026-08-22T06:00:50.018Z DEBUG [config] Validating updated configuration
+2026-08-22T06:00:50.029Z INFO  [config] Configuration reloaded profiles=3
+2026-08-22T06:00:50.034Z INFO  [collector-b] Endpoint updated address=198.51.100.42
+2026-08-22T06:00:50.048Z DEBUG [scheduler] Starting cycle cycleId=cycle-0005
+2026-08-22T06:00:50.066Z INFO  [collector-a] Poll started sourceId=source-a endpoint=192.0.2.21
+2026-08-22T06:00:50.070Z INFO  [collector-b] Poll started sourceId=source-b endpoint=198.51.100.42
+2026-08-22T06:00:50.074Z INFO  [collector-c] Poll started sourceId=source-c endpoint=192.0.2.23
+2026-08-22T06:00:50.129Z INFO  [collector-a] Poll completed records=24 elapsedMs=62
+2026-08-22T06:00:50.141Z INFO  [collector-c] Poll completed records=11 elapsedMs=66
+2026-08-22T06:00:50.173Z INFO  [collector-b] Poll completed records=13 elapsedMs=102
+2026-08-22T06:00:50.190Z INFO  [scheduler] Cycle completed cycleId=cycle-0005 records=48 elapsedMs=141
+2026-08-22T06:00:55.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=3
+2026-08-22T06:01:00.008Z DEBUG [archive] Creating daily snapshot path=/var/lib/tailord-demo/archive/2026-08-22.json
+2026-08-22T06:01:00.044Z INFO  [archive] Snapshot created entries=48 bytes=6144
+2026-08-22T06:01:00.051Z DEBUG [uploader] Upload started destination=https://upload.demo.invalid/snapshots/2026-08-22
+2026-08-22T06:01:00.298Z WARN  [uploader] Upload response delayed elapsedMs=246 thresholdMs=200
+2026-08-22T06:01:00.512Z ERROR [uploader] Upload failed statusCode=503 reason="Service Unavailable"
+2026-08-22T06:01:00.514Z INFO  [uploader] Retry scheduled delay=00:00:05 attempt=1
+2026-08-22T06:01:05.522Z INFO  [uploader] Upload retry started attempt=1
+2026-08-22T06:01:05.811Z INFO  [uploader] Upload completed statusCode=201 elapsedMs=288
+2026-08-22T06:01:10.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=2
+2026-08-22T06:01:20.004Z DEBUG [cleanup] Scanning temporary directory /tmp/tailord-demo
+2026-08-22T06:01:20.019Z INFO  [cleanup] Removed expired files count=4 reclaimedBytes=32768
+2026-08-22T06:01:30.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=2
+2026-08-22T06:01:40.006Z DEBUG [metrics] rate.linesPerSecond=48.7 queue.depth=2 memory.mb=84.3
+2026-08-22T06:01:40.018Z INFO  [metrics] Metrics published destination=203.0.113.15:4317
+2026-08-22T06:01:50.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=2
+Source source-c has not produced data for 30 seconds
+2026-08-22T06:02:00.009Z WARN  [collector-c] Source is silent lastSeen=2026-08-22T06:01:29.991Z threshold=30s
+2026-08-22T06:02:00.021Z DEBUG [collector-c] Starting connectivity diagnostic
+2026-08-22T06:02:00.044Z ERROR [collector-c] Connection refused endpoint=192.0.2.23:9000
+2026-08-22T06:02:00.045Z ERROR [collector-c] System.Net.Sockets.SocketException: Connection refused
+   at Demo.Transport.SocketConnector.ConnectAsync(String host, Int32 port)
+   at Demo.Collectors.SourceCollector.CheckConnectionAsync()
+2026-08-22T06:02:00.067Z WARN  [health] Healthcheck completed status=Degraded dependency=source-c
+2026-08-22T06:02:10.012Z INFO  [collector-c] Reconnection attempt=1 endpoint=192.0.2.23:9000
+2026-08-22T06:02:10.218Z WARN  [collector-c] Reconnection timeout attempt=1 timeoutMs=200
+2026-08-22T06:02:20.011Z INFO  [collector-c] Reconnection attempt=2 endpoint=192.0.2.23:9000
+2026-08-22T06:02:20.094Z INFO  [collector-c] Reconnected endpoint=192.0.2.23:9000 elapsedMs=82
+2026-08-22T06:02:20.109Z INFO  [collector-c] Poll completed records=31 elapsedMs=14
+2026-08-22T06:02:20.120Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=3
+2026-08-22T06:02:30.005Z DEBUG [scheduler] Starting cycle cycleId=cycle-0012
+2026-08-22T06:02:30.209Z CRITICAL [storage] Write-ahead log cannot be flushed path=/var/lib/tailord-demo/state.db-wal
+2026-08-22T06:02:30.210Z CRITICAL [storage] System.IO.IOException: No space left on device.
+   at Demo.Storage.SnapshotWriter.FlushAsync(CancellationToken cancellationToken)
+   at Demo.Storage.StateRepository.CommitAsync(CancellationToken cancellationToken)
+2026-08-22T06:02:30.221Z ERROR [scheduler] Cycle aborted cycleId=cycle-0012 reason="Storage unavailable"
+2026-08-22T06:02:30.228Z WARN  [retention] Emergency cleanup started targetBytes=104857600
+2026-08-22T06:02:30.346Z INFO  [retention] Deleted old snapshots count=12 reclaimedBytes=157286400
+2026-08-22T06:02:30.401Z INFO  [storage] Write-ahead log flush succeeded elapsedMs=37
+2026-08-22T06:02:30.412Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=4
+2026-08-22T06:02:40.001Z DEBUG [scheduler] Starting cycle cycleId=cycle-0013
+2026-08-22T06:02:40.173Z INFO  [scheduler] Cycle completed cycleId=cycle-0013 records=46 elapsedMs=171
+2026-08-22T06:02:50.000Z INFO  [health] Healthcheck completed status=Healthy elapsedMs=2
+2026-08-22T06:03:00.000Z INFO  [summary] Window completed duration=00:03:00 lines=108 warnings=14 errors=8 critical=2
+2026-08-22T06:03:00.012Z INFO  [summary] Recurring match pattern="timeout" count=7 first=06:00:30 last=06:02:10
+2026-08-22T06:03:00.019Z INFO  [summary] Sources healthy=3 degraded=0 missing=0
