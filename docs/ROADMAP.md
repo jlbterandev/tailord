@@ -85,8 +85,19 @@ regular expressions, color rules, and visible counters.
 
 ## 9. Persistence
 
-Add platform-correct paths, schema-versioned JSON, atomic writes, workspaces,
-session restoration, missing-file behavior, and recovery from invalid data.
+- Add a settings window for theme, log font family and size, optional colors,
+  visible-line limits, and update behavior.
+- Keep the file polling interval separate from the visual batching interval.
+- Provide safe defaults and place low-level timing values in advanced settings
+  if they remain useful after performance testing.
+- Add platform-correct paths, schema-versioned JSON, and atomic writes.
+- Persist workspaces with open file paths, tab order, active tab, filters,
+  colors, auto-scroll, and relevant panel state.
+- Make restoration of the previous session optional.
+- Reopen restored files in following mode rather than permanently paused.
+- Preserve missing tabs with a `File not found` state.
+- Recover safely from invalid or partially written configuration.
+- Never persist log content, credentials, or large line caches.
 
 ## 10. Monitoring and alerts
 

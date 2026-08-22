@@ -64,6 +64,24 @@ Windows Service may serve the same purpose on their platforms. The exact host
 and notification design will be selected and tested in a later stage; it is not
 part of the core reader or the current CLI behavior.
 
+## Settings experience
+
+The desktop application will provide a settings window for user preferences
+such as theme, log font family and size, optional level and exception colors,
+the maximum number of visible lines, and session restoration.
+
+Update behavior has two separate concerns and must not be represented as a
+single ambiguous value:
+
+- The file polling interval controls how often the core checks for appended
+  content when following a log.
+- The visual update interval controls how often accumulated lines are delivered
+  to the desktop UI.
+
+Safe defaults should work without configuration. Exact timing and batching
+values may be exposed as advanced settings or through understandable
+responsiveness presets after performance testing.
+
 ## Persistence
 
 Future per-user configuration will use the standard application-data location
@@ -73,6 +91,12 @@ workspaces will be stored separately using versioned JSON and atomic writes.
 Tailord may remember open paths, tab order, filters, colors, and visual state.
 It will not persist log contents, credentials, large line caches, or a paused
 state as the permanent startup default.
+
+Restoring the previous session will be optional. When enabled, Tailord will
+reopen saved tabs and resume following rather than restoring them as paused. A
+missing file will keep its tab and show a clear `File not found` state. User
+configuration and session files remain local application data and must never be
+committed to the Tailord repository.
 
 ## Product constraints
 
