@@ -31,6 +31,16 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        viewModel.SelectFile(path);
+        await viewModel.OpenFileAsync(path);
+    }
+
+    protected override void OnClosed(EventArgs eventArgs)
+    {
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            viewModel.CancelReading();
+        }
+
+        base.OnClosed(eventArgs);
     }
 }
